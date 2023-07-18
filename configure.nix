@@ -14,6 +14,7 @@
   nixpkgs.config.allowUnfree = true;
     
   boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
   boot.kernel.sysctl."net.ipv4.conf.all.forwarding" = "1";
   # boot.loader.efi.canToutchEfiVariables = true;
   # Use the GRUB 2 boot loader.
