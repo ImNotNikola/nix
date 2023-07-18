@@ -63,10 +63,22 @@
   	};
   };
 
+  services.nginx.enable = true;
+  services.nginx.virtualHosts."nikolakuhar.com" = {
+    addSSL = true;
+    enableACME = true;
+    root = "/var/www/nikolakuhar.com";
+  };
+
+  security.acme = {
+    acceptTerms = true;
+    email = "admin@nikolakuhar.com";
+  };
+  
   services.syncthing = {
- 	enable = true;
- 	user = "syncthing";
- 	guiAddress = "0.0.0.0:8384";
+ 	  enable = true;
+ 	  user = "syncthing";
+ 	  guiAddress = "0.0.0.0:8384";
   };
 
   users.mutableUsers = false;
