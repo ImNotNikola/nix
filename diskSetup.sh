@@ -1,3 +1,5 @@
+# Original author: https://github.com/Guekka/nixos-server/blob/1-impermanence/scripts/nix-setup.sh
+
 DISK=/dev/sde
 
 parted "$DISK" -- mklabel gpt
