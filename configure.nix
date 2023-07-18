@@ -10,6 +10,7 @@
       ./hardware-configuration.nix
     ];
 
+  hardware.enableAllFirmware = true;
   nixpkgs.config.allowUnfree = true;
     
   boot.loader.systemd-boot.enable = true;
@@ -45,6 +46,8 @@
   #   keyMap = "us";
   #   useXkbConfig = true; # use xkbOptions in tty.
   # };
+
+  boot.supportedFilesystems = [ "btrfs" ];
 
   # Enable the X11 windowing system.
   # services.xserver.enable = true;
