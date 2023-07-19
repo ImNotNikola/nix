@@ -32,13 +32,21 @@ zpool create \
 	-O mountpoint=none \
 	root /dev/disk/by-partlabel/root
 
+zfs create -o mountpoint=legacy -o compression=lz4 root/system
+zfs create -o mountpoint=legacy -o compression=lz4 root/system/root
+mount -t zfs root/system/root /mnt/
 zfs create -o mountpoint=legacy -o compression=lz4 root/local
+zfs create -o mountpoint=legacy -o compression=lz4 root/local/var
+mkdir -p /mnt/var
+mount -t zfs root/local/var /mnt/var
+zfs create -o mountpoint=legacy -o compression=lz4 root/local/nix
 zfs create -o mountpoint=legacy -o compression=lz4 root/user
 zfs create -o mountpoint=legacy -o compression=lz4 root/user/home
-zfs create -o mountpoint=legacy -o compression=lz4 root/local/nix
-zfs create -o mountpoint=legacy -o compression=lz4 root/system
-zfs create -o mountpoint=/boot root/boot
+mkdir -p /mnt/home
+mount -t zfs root/user/home /mnt/home
 
+
+zfs create -o mountpoint=/boot root/boot
 mkfs.vfat -n EFI /dev/disk/by-partlabel/efi
 mkdir -p /mnt/boot/efi
 mount -t vfat /dev/disk/by-partlabel/efi /mnt/boot/efi
