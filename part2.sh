@@ -1,3 +1,6 @@
+MAINCFG="/mnt/etc/nixos/configuration.nix"
+HWCFG="/mnt/etc/nixos/hardware-configuration.nix"
+
 sed -i 's|fsType = "zfs";|fsType = "zfs"; options = [ "zfsutil" "X-mount.mkdir" ];|g' ${HWCFG}
 
 ADDNR=$(awk '/^  fileSystems."\/" =$/ {print NR+3}' ${HWCFG})
