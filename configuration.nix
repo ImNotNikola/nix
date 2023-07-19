@@ -75,7 +75,7 @@
     isNormalUser = true;
     initialPassword = "abc123";
     extraGroups = [ "wheel" ];
-    openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICWVNch9BcjkMqS/Xwep+GN4HwqyRIjr3Cuw7mHpqsKr nixos" ];
+    openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILVDmZyOI0fRbQH3Wm23XeuJ9ykbiFy6VBPvmKgTYXdm nikola@laptop" ];
   };
 
   environment.systemPackages = with pkgs; [
