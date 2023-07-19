@@ -112,7 +112,7 @@ zfs create -o atime=off ${ZFS_ROOT}/${ZFS_ROOT_VOL}/nix
 zfs create ${ZFS_ROOT}/${ZFS_ROOT_VOL}/root
 zfs create ${ZFS_ROOT}/${ZFS_ROOT_VOL}/usr
 zfs create ${ZFS_ROOT}/${ZFS_ROOT_VOL}/var
-zfs create ${ZFS_ROOT}/${ZFS_ROOT_VOL}/var/lib/containers/storage
+zfs create ${ZFS_ROOT}/${ZFS_ROOT_VOL}containers/
 
 # Create datasets (subvolumes) in the boot dataset
 # This comes last because boot order matters
