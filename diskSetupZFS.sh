@@ -152,6 +152,9 @@ chattr +i /mnt/etc/zfs/zpool.cache
 # Generate and edit configs
 nixos-generate-config --root /mnt
 
+cp /mnt/etc/nixos/configure.nix /mnt/etc/nixos/configure.nix.old
+cp /tmp/configureation.nix /mnt/etc/nixos/configuration.nix
+
 sed -i 's|fsType = "zfs";|fsType = "zfs"; options = [ "zfsutil" "X-mount.mkdir" ];|g' ${HWCFG}
 
 ADDNR=$(awk '/^  fileSystems."\/" =$/ {print NR+3}' ${HWCFG})
@@ -194,12 +197,9 @@ then
 fi
 
 set +x
-
-echo "Now do this (preferably in another shell, this will put out a lot of text):"
-echo "nixos-install -v --show-trace --no-root-passwd --root /mnt"
+# nix eval --file /mnt/etc/nixos/configuration.nix
+echo "nixos-install --no-root-passwd --root /mnt"
 echo "umount -Rl /mnt"
 echo "zpool export -a"
 echo "swapoff -a"
 echo "reboot"
-echo "Make note of these instructions because the nixos-install command will output a lot of text."
-
