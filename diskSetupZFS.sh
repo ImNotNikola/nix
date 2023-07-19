@@ -37,7 +37,6 @@ zfs create -o mountpoint=legacy -o compression=lz4 root/user
 zfs create -o mountpoint=legacy -o compression=lz4 root/user/home
 zfs create -o mountpoint=legacy -o compression=lz4 root/local/nix
 zfs create -o mountpoint=legacy -o compression=lz4 root/system
-zfs create -o mountpoint=legacy -o compression=lz4 root/system/root
 zfs create -o mountpoint=/boot root/boot
 
 mkfs.vfat -n EFI /dev/disk/by-partlabel/efi
