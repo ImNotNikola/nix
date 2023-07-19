@@ -13,19 +13,14 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.supportedFilesystems = [ "zfs" ];
   boot.kernel.sysctl."net.ipv4.conf.all.forwarding" = "1";
-  boot.kernelPackages = config.boot.zfs.packages.latestCompatibleLinuxPackages;
-  boot.initrd = {
-    kernelModules = [ "zfs" ];
-    postDeviceCommands = '' zpool import -lf root '';
-  };
- 
+  boot.kernelPackages = config.boot.zfs.packages.latestCompatibleLinuxPackages; 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   services.ntp.enable = true;
   time.timeZone = "America/New_York";
   
   boot.zfs.forceImportRoot = true;
-  boot.zfs.extraPools = [ "rpool" "tank" ];
+  boot.zfs.extraPools = [ "tank" ];
   networking.hostId = "abcd1234";
   services.zfs.autoScrub.enable = true;
   services.zfs.trim.enable = true;
@@ -55,20 +50,20 @@
     };
   };
 
-  virtualisation.oci-containers.containers."jellyfin" = {
-  	autoStart = true;
-  	image = "jellyfin/jellyfin";
-  	volumes = [
-  	  "/media/jellyfin/config:/config"
-  	  "/media/jellyfin/cache:/cache"
-  	  "/media/jellyfin/movies:/movies"
-  	  "/media/jellyfin/tv:/tv"	
-  	];
-  	ports = [ "8096:8096"];
-  	environment = {
-  		JELLYFIN_LOG_DIR = "/log";
-  	};
-  };
+ # virtualisation.oci-containers.containers."jellyfin" = {
+ # 	autoStart = true;
+ # 	image = "jellyfin/jellyfin";
+ #	 volumes = [
+ # 	  "/media/jellyfin/config:/config"
+ # 	  "/media/jellyfin/cache:/cache"
+ # 	  "/media/jellyfin/movies:/movies"
+ # 	  "/media/jellyfin/tv:/tv"	
+ # 	];
+ # 	ports = [ "8096:8096"];
+ # 	environment = {
+ # 		JELLYFIN_LOG_DIR = "/log";
+ # 	};
+ # };
 
   users.mutableUsers = false;
   users.users.nikola = {
@@ -96,12 +91,31 @@
   ];
 
   #services.tailscale.enable = true;
+  #systemd.services.tailscale-autoconnect = {
+  #description = "Automatic connection to Tailscale";
+
+  #after = [ "network-pre.target" "tailscale.service" ];
+  #wants = [ "network-pre.target" "tailscale.service" ];
+  #wantedBy = [ "multi-user.target" ];
+
+  #serviceConfig.Type = "oneshot";
+  #script = with pkgs; ''
+  #  sleep 2
+
+  #  status="$(${tailscale}/bin/tailscale status -json | ${jq}/bin/jq -r .BackendState)"
+  #  if [ $status = "Running" ]; then # if so, then do nothing
+  #    exit 0
+  #  fi
+
+  #  ${tailscale}/bin/tailscale up -authkey tskey-auth-kwecwu1CNTRL-ahD1vLK13uKhuFCJbxM9mKMiynV7VJxK
+  #'';
+  #};
 
   services.openssh = {
     enable = true;
     passwordAuthentication = true;
     allowSFTP = false;
-    #challengeResponseAuthentication = false;
+    challengeResponseAuthentication = false;
     extraConfig = ''
       AllowTcpForwarding yes
       X11Forwarding no
@@ -115,6 +129,8 @@
   	enable = true;
   	allowedTCPPorts = [ 22 80 443 8096 8384 ];
   	allowedUDPPorts = [ 22 80 443 8096 8384 ];
+    #trustedInterfaces = [ "tailscale0" ];
+    #allowedUDPPorts = [ config.services.tailscale.port ];
   };
 
   nix.settings.sandbox = true;
