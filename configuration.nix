@@ -11,16 +11,23 @@
     
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  boot.loader.systemd-boot.extraInstallCommands = '' mount -t vfat -o iocharset=iso8859-1 /dev/disk/by-label/ESP /efiboot/efi '';
+  boot.loader.generationsDir.copyKernels = true;
+  boot.supportedFilesystems = [ "zfs" ];
   boot.kernel.sysctl."net.ipv4.conf.all.forwarding" = "1";
+  boot.kernelPackages = config.boot.zfs.packages.latestCompatibleLinuxPackages;
+  boot.initrd = {
+    kernelModules = [ "zfs" ];
+    postDeviceCommands = '' zpool import -lf rpool '';
  
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   services.ntp.enable = true;
   time.timeZone = "America/New_York";
   
-  boot.supportedFilesystems = [ "zfs" ];
-  boot.zfs.forceImportRoot = false;
-  #boot.zfs.extraPools = [ "tank" ];
+  boot.zfs.forceImportRoot = true;
+  boot.zfs.extraPools = [ "rpool" "tank" ];
+  boot.zfs.devNode = "/dev/disk/by-partuuid/";
   networking.hostId = "fe9c7f2a";
   services.zfs.autoScrub.enable = true;
   services.zfs.trim.enable = true;
@@ -44,7 +51,9 @@
   virtualisation = {
     podman = {
       enable = true;
+      dockerCompat = true;
       defaultNetwork.settings.dns_enabled = true;
+      extraPackages = [ pkgs.zfs ];
     };
   };
 
@@ -63,29 +72,11 @@
   	};
   };
 
-  services.nginx.enable = true;
-  services.nginx.virtualHosts."nikolakuhar.com" = {
-    addSSL = true;
-    enableACME = true;
-    root = "/var/www/nikolakuhar.com";
-  };
-
-  security.acme = {
-    acceptTerms = true;
-    email = "admin@nikolakuhar.com";
-  };
-  
-  services.syncthing = {
- 	  enable = true;
- 	  user = "syncthing";
- 	  guiAddress = "0.0.0.0:8384";
-  };
-
   users.mutableUsers = false;
   users.users.nikola = {
     isNormalUser = true;
     extraGroups = [ "wheel" ];
-    openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICWVNch9BcjkMqS/Xwep+GN4HwqyRIjr3Cuw7mHpqsKr nixos" ];
+    #openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICWVNch9BcjkMqS/Xwep+GN4HwqyRIjr3Cuw7mHpqsKr nixos" ];
   };
 
   environment.systemPackages = with pkgs; [
@@ -105,23 +96,22 @@
     tailscale
   ];
 
-  services.tailscale.enable = true;
+  #services.tailscale.enable = true;
 
   services.openssh = {
     enable = true;
-    passwordAuthentication = false;
-    allowSFTP = false;
-    challengeResponseAuthentication = false;
-    extraConfig = ''
-      AllowTcpForwarding yes
-      X11Forwarding no
-      AllowAgentForwarding no
-      AllowStreamLocalForwarding no
-      AuthenticationMethods publickey
-    '';
+    #passwordAuthentication = false;
+    #allowSFTP = false;
+    #challengeResponseAuthentication = false;
+    #extraConfig = ''
+     # AllowTcpForwarding yes
+     # X11Forwarding no
+     # AllowAgentForwarding no
+     # AllowStreamLocalForwarding no
+     # AuthenticationMethods publickey
+    #'';
   };
 
-  # Open ports in the firewall.
   networking.firewall = {
   	enable = true;
   	allowedTCPPorts = [ 22 80 443 8096 8384 ];
