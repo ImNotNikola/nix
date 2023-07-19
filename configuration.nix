@@ -19,7 +19,7 @@
   services.ntp.enable = true;
   time.timeZone = "America/New_York";
   
-  boot.zfs.forceImportRoot = true;
+  boot.zfs.forceImportRoot = false;
   boot.zfs.extraPools = [ "tank" ];
   networking.hostId = "abcd1234";
   services.zfs.autoScrub.enable = true;
