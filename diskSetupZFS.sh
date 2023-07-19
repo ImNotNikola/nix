@@ -1,6 +1,6 @@
 set -ex
 
-DISK=(/dev/sdX)
+DISK=(/dev/disk/by-id/ata-Samsung_SSD_870_EVO_250GB_S6PDNM0T534366P)
 
 set +x
 
