@@ -4,19 +4,19 @@ sgdisk --zap-all ${DISK}
 parted --script --align=optimal  ${DISK} -- \
 mklabel gpt \
 mkpart ESP fat32 0% 1GiB \
-mkpart root 1GiB 100% \
+mkpart primary 1GiB 100% \
 set 1 esp on 
 
 partprobe ${DISK}
 udevadm settle
 
-mkfs.ext4 -L nixos ${DISK}
+#mkfs.ext4 -L nixos ${DISK}-p2
+#mount /dev/disk/by-label/nixos /mnt
 
-zfs create -o mountpoint=/boot root/boot
-mkfs.fat -F 32 -n boot /dev/disk/${DISK}
-mkdir -p /mnt/boot
-mount -t vfat /dev/disk/by-label/boot /mnt/boot
+#mkfs.fat -F 32 -n boot ${DISK}-p1
+#mkdir -p /mnt/boot
+#mount -t vfat /dev/disk/by-label/boot /mnt/boot
 
-nixos-generate-config --root /mnt
+#nixos-generate-config --root /mnt
 
 echo "done!"
