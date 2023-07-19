@@ -11,7 +11,7 @@
     
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.loader.systemd-boot.extraInstallCommands = '' mount -t vfat -o iocharset=iso8859-1 /dev/disk/by-label/ESP /efiboot/efi '';
+  boot.loader.systemd-boot.extraInstallCommands = '' mount -t vfat -o iocharset=iso8859-1 /dev/disk/by-label/ESP /efi/efi '';
   boot.loader.generationsDir.copyKernels = true;
   boot.supportedFilesystems = [ "zfs" ];
   boot.kernel.sysctl."net.ipv4.conf.all.forwarding" = "1";
