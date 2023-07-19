@@ -10,6 +10,8 @@ ZFS_ROOT="rpool"
 
 ZFS_ROOT_VOL="nixos"
 
+MNT=$(mktemp -d)
+
 set +x
 
 MAINCFG="/mnt/etc/nixos/configuration.nix"
@@ -17,8 +19,18 @@ HWCFG="/mnt/etc/nixos/hardware-configuration.nix"
 
 set -x
 
+sgdisk --zap-all ${DISK}
+
+parted --script --align=optimal  "${DISK}" -- \
+mklabel gpt \
+mkpart EFI 2MiB 1GiB \
+mkpart rpool 1GiB 100% \
+set 1 esp on 
+
 # Wait for a bit to let udev catch up and generate /dev/disk/by-partlabel.
 sleep 3s
+partprobe "${DISK}"
+udevadm settle
 
 # Create the root pool
 zpool create \
@@ -68,6 +80,8 @@ sed -i "${ADDNR}i"' \      neededForBoot = true;' ${HWCFG}
 
 ADDNR=$(awk '/^  fileSystems."\/boot" =$/ {print NR+3}' ${HWCFG})
 sed -i "${ADDNR}i"' \      neededForBoot = true;' ${HWCFG}
+
+sed -i "s|\"abcd1234\"|\"$(head -c4 /dev/urandom | od -A none -t x4| sed 's| ||g' || true)\"|g" ${MNT}/etc/nixos/configuration.nix
 
 set +x
 echo "nixos-install --no-root-passwd --root /mnt"
