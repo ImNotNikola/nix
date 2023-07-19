@@ -19,6 +19,8 @@
   boot.initrd = {
     kernelModules = [ "zfs" ];
     postDeviceCommands = '' zpool import -lf rpool '';
+    #postDeviceCommands = lib.mkAfter '' zfs rollback -r ${ZFS_ROOT}/${ZFS_ROOT_VOL}@${EMPTYSNAP}'';
+  };
  
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
@@ -28,7 +30,7 @@
   boot.zfs.forceImportRoot = true;
   boot.zfs.extraPools = [ "rpool" "tank" ];
   boot.zfs.devNode = "/dev/disk/by-partuuid/";
-  networking.hostId = "fe9c7f2a";
+  networking.hostId = $(head -c 8 /etc/machine-id)";
   services.zfs.autoScrub.enable = true;
   services.zfs.trim.enable = true;
 
