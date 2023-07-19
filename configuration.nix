@@ -11,15 +11,12 @@
     
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.loader.systemd-boot.extraInstallCommands = '' mount -t vfat -o iocharset=iso8859-1 /dev/disk/by-label/ESP /efi/efi '';
-  boot.loader.generationsDir.copyKernels = true;
   boot.supportedFilesystems = [ "zfs" ];
   boot.kernel.sysctl."net.ipv4.conf.all.forwarding" = "1";
   boot.kernelPackages = config.boot.zfs.packages.latestCompatibleLinuxPackages;
   boot.initrd = {
     kernelModules = [ "zfs" ];
     postDeviceCommands = '' zpool import -lf rpool '';
-    #postDeviceCommands = lib.mkAfter '' zfs rollback -r ${ZFS_ROOT}/${ZFS_ROOT_VOL}@${EMPTYSNAP}'';
   };
  
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -29,8 +26,7 @@
   
   boot.zfs.forceImportRoot = true;
   boot.zfs.extraPools = [ "rpool" "tank" ];
-  boot.zfs.devNode = "/dev/disk/by-partuuid/";
-  networking.hostId = $(head -c 8 /etc/machine-id)";
+  networking.hostId = b33fb33f";
   services.zfs.autoScrub.enable = true;
   services.zfs.trim.enable = true;
 
@@ -77,8 +73,9 @@
   users.mutableUsers = false;
   users.users.nikola = {
     isNormalUser = true;
+    initialPassword = "abc123";
     extraGroups = [ "wheel" ];
-    #openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICWVNch9BcjkMqS/Xwep+GN4HwqyRIjr3Cuw7mHpqsKr nixos" ];
+    openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICWVNch9BcjkMqS/Xwep+GN4HwqyRIjr3Cuw7mHpqsKr nixos" ];
   };
 
   environment.systemPackages = with pkgs; [
@@ -102,16 +99,16 @@
 
   services.openssh = {
     enable = true;
-    #passwordAuthentication = false;
-    #allowSFTP = false;
+    passwordAuthentication = true;
+    allowSFTP = false;
     #challengeResponseAuthentication = false;
-    #extraConfig = ''
-     # AllowTcpForwarding yes
-     # X11Forwarding no
-     # AllowAgentForwarding no
-     # AllowStreamLocalForwarding no
-     # AuthenticationMethods publickey
-    #'';
+    extraConfig = ''
+      AllowTcpForwarding yes
+      X11Forwarding no
+      AllowAgentForwarding no
+      AllowStreamLocalForwarding no
+      AuthenticationMethods publickey
+    '';
   };
 
   networking.firewall = {
