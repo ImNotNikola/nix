@@ -26,7 +26,7 @@
   
   boot.zfs.forceImportRoot = true;
   boot.zfs.extraPools = [ "rpool" "tank" ];
-  networking.hostId = b33fb33f";
+  networking.hostId = "abcd1234";
   services.zfs.autoScrub.enable = true;
   services.zfs.trim.enable = true;
 
