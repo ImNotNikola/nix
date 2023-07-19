@@ -16,7 +16,7 @@
   boot.kernelPackages = config.boot.zfs.packages.latestCompatibleLinuxPackages;
   boot.initrd = {
     kernelModules = [ "zfs" ];
-    postDeviceCommands = '' zpool import -lf rpool '';
+    postDeviceCommands = '' zpool import -lf root '';
   };
  
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
