@@ -62,7 +62,6 @@
   users.mutableUsers = false;
   users.users.nikola = {
     isNormalUser = true;
-    initialPassword = "abc123";
     extraGroups = [ "wheel" "podman" ];
     openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILVDmZyOI0fRbQH3Wm23XeuJ9ykbiFy6VBPvmKgTYXdm nikola@laptop" ];
   };
@@ -74,6 +73,7 @@
     bat
     ripgrep
     neofetch
+    iftop
     zsh
     duf
     htop
