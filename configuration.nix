@@ -62,7 +62,7 @@
   security.sudo.wheelNeedsPassword = false;
   users.mutableUsers = false;
   users.users.nikola = {
-    users.users.asdf.passwordFile = "/data/.passwordFile";
+    passwordFile = "/data/.passwordFile";
     isNormalUser = true;
     extraGroups = [ "wheel" "podman" ];
     openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILVDmZyOI0fRbQH3Wm23XeuJ9ykbiFy6VBPvmKgTYXdm nikola@laptop" ];
