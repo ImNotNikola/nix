@@ -8,7 +8,6 @@
   hardware.enableAllFirmware = true;
   nixpkgs.config.allowUnfree = true;
   boot.kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
-  # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.kernel.sysctl."net.ipv4.conf.all.forwarding" = "1";
@@ -101,42 +100,35 @@
     '';
   };
 
-  
   services.tailscale.enable = true;
   systemd.services.tailscale-autoconnect = {
-  description = "Automatic connection to Tailscale";
+    description = "Automatic connection to Tailscale";
 
-  after = [ "network-pre.target" "tailscale.service" ];
-  wants = [ "network-pre.target" "tailscale.service" ];
-  wantedBy = [ "multi-user.target" ];
+    after = [ "network-pre.target" "tailscale.service" ];
+    wants = [ "network-pre.target" "tailscale.service" ];
+    wantedBy = [ "multi-user.target" ];
 
-  serviceConfig.Type = "oneshot";
-  script = with pkgs; ''
-    sleep 2
+    serviceConfig.Type = "oneshot";
+    script = with pkgs; ''
+      sleep 2
 
-    status="$(${tailscale}/bin/tailscale status -json | ${jq}/bin/jq -r .BackendState)"
-    if [ $status = "Running" ]; then # if so, then do nothing
-      exit 0
-    fi
+      status="$(${tailscale}/bin/tailscale status -json | ${jq}/bin/jq -r .BackendState)"
+      if [ $status = "Running" ]; then # if so, then do nothing
+        exit 0
+      fi
 
-    ${tailscale}/bin/tailscale up -authkey tskey-auth-kwecwu1CNTRL-ahD1vLK13uKhuFCJbxM9mKMiynV7VJxK
-  '';
+      ${tailscale}/bin/tailscale up -authkey tskey-auth-kwecwu1CNTRL-ahD1vLK13uKhuFCJbxM9mKMiynV7VJxK
+    '';
   };
 
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
   networking.firewall = {
     enable = true;
     allowedTCPPorts = [ 22 ];
-    allowedUDPPorts = [ 22 ];
+    allowedUDPPorts = [ 22 config.services.tailscale.port ];
     trustedInterfaces = [ "tailscale0" ];
-    allowedUDPPorts = [ config.services.tailscale.port ];
   };
 
   nix.settings.sandbox = true;
-  system.stateVersion = "23.05"; # Did you read the comment?
+  system.stateVersion = "23.05";
 
 }
