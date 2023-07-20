@@ -59,6 +59,7 @@
     };
   }; 
 
+  security.sudo.wheelNeedsPassword = false;
   users.mutableUsers = false;
   users.users.nikola = {
     isNormalUser = true;
