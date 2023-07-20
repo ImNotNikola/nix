@@ -10,13 +10,13 @@ set 1 esp on
 partprobe ${DISK}
 udevadm settle
 
-#mkfs.ext4 -L nixos ${DISK}-p2
-#mount /dev/disk/by-label/nixos /mnt
+mkfs.ext4 -L nixos ${DISK}-part2
+mount /dev/disk/by-label/nixos /mnt
 
-#mkfs.fat -F 32 -n boot ${DISK}-p1
-#mkdir -p /mnt/boot
-#mount -t vfat /dev/disk/by-label/boot /mnt/boot
+mkfs.fat -F 32 -n boot ${DISK}-part1
+mkdir -p /mnt/boot
+mount /dev/disk/by-label/boot /mnt/boot
 
-#nixos-generate-config --root /mnt
+nixos-generate-config --root /mnt
 
 echo "done!"
