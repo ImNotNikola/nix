@@ -33,5 +33,7 @@
         "nikola@laptop" = mkHome "x86_64-linux" ./hosts/laptop/home.nix;
         "nikola@server" = mkHome "x86_64-linux" ./hosts/server/home.nix;
     };
+    homeManagerModules.default = ./homeManagerModules;
+    nixosModules.default = ./nixosModules;
   };
 }
