@@ -1,108 +1,129 @@
-{ config, pkgs, ... }:
+{
+  inputs,
+  outputs,
+  lib,
+  config,
+  pkgs,
+  ...
+}:
 
 {
-  imports =
-    [ 
-      ./hardware-configuration.nix
-    ];
-  hardware.enableAllFirmware = true;
-  nixpkgs.config.allowUnfree = true;
-  boot.kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-  boot.kernel.sysctl."net.ipv4.conf.all.forwarding" = "1";
-
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
-
-  services.ntp.enable = true;
-  services.fwupd.enable = true;
-
-  time.timeZone = "America/New_York";
-
-  boot.supportedFilesystems = [ "zfs" ];
-  boot.zfs.forceImportRoot = false;
-  boot.zfs.extraPools = [ "tank" "nvme" ];
-  networking.hostId = "abcd1234";
-  services.zfs.autoScrub.enable = true;
-  services.zfs.trim.enable = true;
-
-  services.nfs.server.enable = true;
-
-  boot.plymouth.enable = true;
-
-  networking.networkmanager.enable = true;
-  networking.interfaces.enp5s0.ipv4.addresses = [ {
-    address = "192.168.0.3";
-    prefixLength = 24;
-  } ];
-
-  networking.defaultGateway = "192.168.0.1";
-  networking.nameservers = [ "192.168.0.1" ];
-  networking.hostName = "server";  
-
-  virtualisation = {
-    docker.enable = false;
-    podman = {
-      enable = true;
-      dockerCompat = true;
-      dockerSocket.enable = true;
-      defaultNetwork.settings.dns_enabled = true;
-      extraPackages = [ pkgs.zfs ];
-    };
-  };
-
-  virtualisation.containers.storage.settings = {  
-    storage = {
-       driver = "zfs";
-       graphroot = "/containers/storage";
-       runroot = "/containers/storage";
-    };
-  }; 
-
-  security.sudo.wheelNeedsPassword = false;
-  users.mutableUsers = false;
-  users.users.nikola = {
-    passwordFile = "/data/.passwordFile";
-    isNormalUser = true;
-    extraGroups = [ "wheel" "podman" ];
-    openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILVDmZyOI0fRbQH3Wm23XeuJ9ykbiFy6VBPvmKgTYXdm nikola@laptop" ];
-  };
-
-  environment.systemPackages = with pkgs; [
-    micro
-    git
-    wget
-    bat
-    ripgrep
-    neofetch
-    iftop
-    zsh
-    duf
-    htop
-    tailscale
-    lsof
-    ncdu
-    rsync
-    shadow
-    arion
-    docker-client
+  imports = [
+    ./hardware-configuration.nix
   ];
 
-  services.openssh = {
-    enable = true;
-    passwordAuthentication = false;
-    allowSFTP = false;
-    challengeResponseAuthentication = false;
-    extraConfig = ''
-      AllowTcpForwarding yes
-      X11Forwarding no
-      AllowAgentForwarding no
-      AllowStreamLocalForwarding no
-      AuthenticationMethods publickey
-    '';
+  nixpkgs = {
+    config.allowUnfree = true;
   };
 
-  services.tailscale.enable = true;
+  boot = {
+    plymouth.enable = true;
+    cleanTmpDir = true;
+    loader.systemd-boot.enable = true;
+    loader.efi.canTouchEfiVariables = true;
+    kernelPackages = pkgs.linuxPackages_latest;
+  };
+
+  networking = {
+    hostName = "nixos";
+    networkmanager.enable = true;
+    interfaces.enp0s25.ipv4.addresses = [ {
+      address = "192.168.1.222";
+      prefixLength = 24;
+    } ];
+    defaultGateway = "192.168.1.1";
+    nameservers = [ "192.168.1.1" ];
+    domain = "nikolakuhar.com";
+    # proxy.default = "http://user:password@proxy:port/";
+    # proxy.noProxy = "127.0.0.1,localhost,internal.domain";
+  };
+
+  time.timeZone = "America/New_York";
+  i18n.defaultLocale = "en_US.UTF-8";
+  i18n.extraLocaleSettings = {
+    LC_ADDRESS = "en_US.UTF-8";
+    LC_IDENTIFICATION = "en_US.UTF-8";
+    LC_MEASUREMENT = "en_US.UTF-8";
+    LC_MONETARY = "en_US.UTF-8";
+    LC_NAME = "en_US.UTF-8";
+    LC_NUMERIC = "en_US.UTF-8";
+    LC_PAPER = "en_US.UTF-8";
+    LC_TELEPHONE = "en_US.UTF-8";
+    LC_TIME = "en_US.UTF-8";
+  };
+
+  security = {
+    polkit.enable = true;
+    sudo.wheelNeedsPassword = false;
+  };
+
+  users = {
+    mutableUsers = false;
+    users = {
+      nikola = {
+        isNormalUser = true;
+        shell = pkgs.fish;
+        extraGroups = [
+          "wheel"
+          "networkmnager"
+          "libvertd"
+        ];
+        #openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILVDmZyOI0fRbQH3Wm23XeuJ9ykbiFy6VBPvmKgTYXdm nikola@laptop" ];
+        packages = with pkgs; [ ];
+      };
+    };
+  };
+
+
+  fonts.packages = with pkgs; [
+    noto-fonts
+    ubuntu_font_family
+    noto-fonts-emoji
+    liberation_ttf
+    fira-code
+    fira-code-symbols
+    mplus-outline-fonts.githubRelease
+    dina-font
+    fira
+  ];
+
+  virtualisation.libvirtd.enable = true;
+
+  programs = {
+    fish.enable = true;
+    virt-manager.enable = true;
+  };
+
+  services = {
+    #flatpack.enable = true;
+    netdata.enable = true;
+    openssh = {
+      enable = true;
+      allowSFTP = false;
+      challengeResponseAuthentication = false;
+      settings = {
+        PasswordAuthentication = true;
+        PermitRootLogin = "no";
+      };
+    };
+    #tailscale.enable = true;
+  };
+
+  nix = {
+    settings = {
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
+      auto-optimise-store = true;
+    };
+    gc = {
+      automatic = true;
+      dates = "weekly";
+      options = "--delete-older-thank 15d";
+    };
+  };
+
   systemd.services.tailscale-autoconnect = {
     description = "Automatic connection to Tailscale";
 
@@ -123,14 +144,43 @@
     '';
   };
 
-  networking.firewall = {
-    enable = true;
-    allowedTCPPorts = [ 22 ];
-    allowedUDPPorts = [ 22 config.services.tailscale.port ];
-    trustedInterfaces = [ "tailscale0" ];
-  };
+  environment.systemPackages = with pkgs; [
+    micro
+    wget
+    ripgrep
+    bat
+    neofetch
+    iftop
+    duf
+    lsof
+    ncdu
+    rsync
+    arion
+    shadow
+    htop
+    pkgs.tailscale
+    btop
+    pciutils
+    yt-dlp
+    nmap
+    git
+    angryipscanner
+    gnumake
+    unzip
+    zip
+    gnupg
+    quickemu
+    gtop
+    avahi
+    ffmpeg-full
+    cmake
+    go
+    gcc
+    iotop
+    qemu
+    virt-manager
+    python3
+  ];
 
-  nix.settings.sandbox = true;
-  system.stateVersion = "23.05";
-
+  system.stateVersion = "24.11";
 }
