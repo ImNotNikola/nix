@@ -26,8 +26,8 @@
     pkgs = nixpkgs.legacyPackages.x86_64-linux;
   in {
     nixosConfigurations.server = {
-        laptop = mkSystem ./laptop/configuration.nix;
-        server = mkSystem .server/configuration.nix;
+        laptop = mkSystem ./hosts/laptop/configuration.nix;
+        server = mkSystem ./hosts/server/configuration.nix;
     };
   };
 }
