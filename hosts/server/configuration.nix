@@ -88,6 +88,7 @@
   ];
 
   virtualisation.libvirtd.enable = true;
+  impermanence.enable = true;
 
   programs = {
     fish.enable = true;
