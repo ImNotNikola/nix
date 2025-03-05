@@ -66,6 +66,8 @@
     killall
     fzf
     lf
+    tldr
+    thefuck
     eza
     fd
     zoxide
