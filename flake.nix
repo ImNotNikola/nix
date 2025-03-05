@@ -24,6 +24,7 @@
   outputs = {self, nixpkgs, home-manager,...}@inputs: 
   let
     pkgs = nixpkgs.legacyPackages.x86_64-linux;
+    lib = (import ./lib/default.nix) {inherit inputs;};
   in {
     nixosConfigurations.server = {
         laptop = mkSystem ./hosts/laptop/configuration.nix;
